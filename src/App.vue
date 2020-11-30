@@ -1,6 +1,8 @@
 <template>
   <div id="app">
+    <keep-alive exclude="Detail"> <!--Detail 不需要keep-alive，，因为每次点击详情页都会请求新的数据-->
     <router-view/>
+    </keep-alive>
     <main-tab-bar></main-tab-bar>
   </div>
 </template>

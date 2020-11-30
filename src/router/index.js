@@ -5,6 +5,7 @@ const Home = () => import('../views/home/Home.vue')
 const Category = () => import('../views/category/Category')
 const Cart = () => import('../views/cart/Cart')
 const Profile = () => import('../views/profile/Profile')
+const Detail = () =>import('../views/detail/Detail')
 
 //1，安装插件
 Vue.use(VueRouter)
@@ -30,6 +31,12 @@ const routes = [
   {
     path: '/cart',
     component: Cart
+  },
+  {
+    //动态路由的方式，这里可以从 url 后面加参数，方便传递，当然也可以用 query 方式
+    //注意有一个冒号
+    path: '/detail/:iid',
+    component: Detail
   }
 ]
 const router = new VueRouter({

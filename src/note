@@ -1,0 +1,18 @@
+
+防抖动
+
+
+const refresh = this.debounce(this.$refs.scroll.refresh, 200)
+this.$bus.$on('itemImagLoad', ()=> {
+  refresh()
+})
+
+debounce(func, delay) {
+  let timer = null
+  return function(...arg) {
+    if(timer) clearTimeout(timer)
+    timer = setTimeout(()=> {
+      func.apply(this.args)
+    },delay)
+  }
+}

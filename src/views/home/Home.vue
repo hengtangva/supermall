@@ -1,18 +1,26 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-
+    <TabControl ref = "tabControl1"
+                :titles="['流行','新款','精选']"
+                @tabClick="tabClick"
+                class="tab-control"
+                v-show="isTabFixed"
+    />
     <Scroll class="content"
             ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
             :pull-up-load="true"
-            @pullingUp="loadmore"
+            @pullingUp="loadMore"
     > <!--不写冒号的话，传的是字符串-->
-    <HomeSwiper :banners="banners"/>
-    <HomeRecommendView :recommends="recommends"/>
+    <HomeSwiper :banners="banners"
+                ref="HomeSwiper"
+                @swiperImageLoad="swiperImageLoad"
+    />
+    <HomeRecommendView :recommends="recommends" />
     <HomeFeatureView/>
-    <TabControl class="tab-control"
+    <TabControl ref = "tabControl2"
                 :titles="['流行','新款','精选']"
                 @tabClick="tabClick"
     />
@@ -59,6 +67,14 @@
         return this.goods[this.currentType].list
       }
     },
+    activated() {
+      this.$refs.scroll.scrollTo(0, this.saveY, 0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated() {
+      this.saveY = this.$refs.scroll.getScrollY()
+
+    },
     data(){
       return {
         banners: [],
@@ -69,7 +85,10 @@
           'sell': {page: 0, list:[]},
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        tabOffsetTop: 0,
+        isTabFixed: false,
+        saveY: 0
       }
     },
     created() {
@@ -81,7 +100,21 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+    mounted() {
+
+    },
     methods: {
+
+      //防抖函数
+      //debounce
+
+      swiperImageLoad() {
+        // 获取 tabControl 的offsetTop
+        // 所有的组件都有一个属性 $el : 用于获取组件中的元素
+        console.log(this.$refs.tabControl2.$el.offsetTop);
+        this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+      },
+
       //网络请求相关方法
       getHomeMultidata() {
         getHomeMultidata().then(res => {
@@ -113,15 +146,25 @@
             this.currentType = 'sell';
             break;
         }
+        this.$refs.tabControl1.currenrIndex = index;
+        this.$refs.tabControl2.currenrIndex = index;
 
       },
       backClick() {
         this.$refs.scroll.scrollTo(0,0,500);
       },
+      //是否显示backToTop按钮
       contentScroll(pos) {
+
+        //1,决定 BackTop 是否显示
         this.isShowBackTop = (-pos.y) > 1000
+
+        //2,决定 tabControl 是否吸顶（position：fixed）
+        this.isTabFixed = (-pos.y) > this.tabOffsetTop
+
       },
-      loadmore() {
+      //加载更多
+      loadMore() {
         this.getHomeGoods(this.currentType)
 
         this.$refs.scroll.scroll.refresh()
@@ -132,7 +175,7 @@
 
 <style scoped>
   #home {
-    padding-top: 44px;
+   /* padding-top: 44px;*/
     height: 100vh;  /*视口高度*/
     position: relative;
   }
@@ -140,23 +183,29 @@
     background-color: var(--color-tint);
     color: white;
 
-    position: fixed;
+/*    position: fixed;
     left: 0;
     right: 0;
     top: 0;
-    z-index: 9;
+    z-index: 9;*/
   }
-  .tab-control {
+
+/*  .tab-control {
     position: sticky;
     top: 44px;
     z-index: 9;
+  }*/
+  .tab-control {
+    position: relative;
+    z-index: 9;
+    padding-top: 0;
+    border: 0;
   }
-
   /*通过绝对定位来确定滑动区域位置*/
   .content {
     overflow: hidden;
     position: absolute;
-    top: 44px;
+    top: 43px;
     bottom: 49px;
     left: 0;
     right: 0;

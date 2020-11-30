@@ -1,5 +1,5 @@
 <template>
-  <div class="good">
+  <div class="good" @click="itemClick">
     <img :src="goodsItem.show.img" alt="">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
@@ -20,7 +20,19 @@
         }
       }
     },
+    methods: {
+      itemClick() {
+        //这里用 push 可以返回 home
+        this.$router.push('/detail/'+this.goodsItem.iid)//动态路由方式
+        //也可以采用query方式
+        /*this.$route.push({
+          path: '/detail',
+          query: {
 
+          }
+        })*/
+      }
+    }
   }
 </script>
 
